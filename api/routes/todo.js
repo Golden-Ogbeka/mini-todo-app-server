@@ -5,22 +5,74 @@ const TodoController = require('../controllers/todo')();
 
 router.get('/', TodoController.GetAllTasks);
 
-// // Get user by id
-// router.get('/view/:id', TodoController.ViewUser);
+router.get('/view/:id', TodoController.GetSingleTask);
 
-// router.post(
-//   '/login',
-//   [
-//     body('email', 'Email is required')
-//       .trim()
-//       .exists()
-//       .bail()
-//       .isEmail()
-//       .normalizeEmail({ all_lowercase: true })
-//       .withMessage('Invalid Email format'),
-//     body('password', 'Password is required').trim().exists(),
-//   ],
-//   TodoController.Login
-// );
+router.post(
+  '/',
+  [
+    body('title', 'Title is required')
+      .exists({
+        checkFalsy: true,
+        checkNull: true,
+      })
+      .trim(),
+  ],
+  TodoController.AddTask
+);
+
+router.put(
+  '/:id',
+  [
+    param('id', 'ID is required')
+      .exists({
+        checkFalsy: true,
+        checkNull: true,
+      })
+      .isInt()
+      .toInt()
+      .withMessage('ID must be an integer'),
+    body('title', 'Title is required')
+      .exists({
+        checkFalsy: true,
+        checkNull: true,
+      })
+      .trim(),
+  ],
+  TodoController.UpdateTask
+);
+
+router.patch(
+  '/completed/:id',
+  [
+    param('id', 'ID is required')
+      .exists({
+        checkFalsy: true,
+        checkNull: true,
+      })
+      .isInt()
+      .toInt()
+      .withMessage('ID must be an integer'),
+    body('completed', 'Completed field is required')
+      .isBoolean()
+      .withMessage('Completed field can either be true or false')
+      .toBoolean(),
+  ],
+  TodoController.ToggleTaskCompletion
+);
+
+router.delete(
+  '/:id',
+  [
+    param('id', 'ID is required')
+      .exists({
+        checkFalsy: true,
+        checkNull: true,
+      })
+      .isInt()
+      .toInt()
+      .withMessage('ID must be an integer'),
+  ],
+  TodoController.DeleteTask
+);
 
 module.exports = router;
